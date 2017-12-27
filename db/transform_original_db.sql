@@ -187,7 +187,8 @@ drop sequence static_map_legend_id;
 drop sequence static_map_type_id;
 drop sequence static_maps_id_seq;
 
--- Remove non-public data
+-- Remove non-public data (we don't have permission to distribute copyrighted assets)
+
 delete from assets a where copyrighted or not exists (select * from illustrations where asset_id=a.id);
 delete from illustrations where asset_id not in (select id from assets);
 delete from asset_files where id not in (select file_id from assets);
@@ -195,7 +196,12 @@ update byways set primary_photo_id = null where primary_photo_id not in (select 
 update byways set logo_id = null where logo_id not in (select id from assets);
 update byways set roadsign_id = null where roadsign_id not in (select id from assets);
 
--- Clean up schema
+--
+-- Clean up schema for better referential integrity, etc.
+--
+
+-- Split illustrations
+
 create table byways_assets (
   byway_id int not null references byways(id) on delete cascade,
   asset_id int not null references assets(id) on delete cascade
@@ -211,6 +217,8 @@ insert into places_assets select illustratable_id, asset_id from illustrations w
 
 drop table illustrations;
 
+-- Remove implementation-specific columns from asset_files
+
 alter table asset_files drop column remote_file_name;
 alter table asset_files drop column remote_file_size;
 alter table asset_files drop column remote_content_type;
@@ -220,15 +228,21 @@ alter table asset_files rename column local_file_name to file_file_name;
 alter table asset_files rename column local_file_size to file_file_size;
 alter table asset_files rename column local_updated_at to file_updated_at;
 
+-- Clean up routes
+
 alter table routes rename to byway_routes;
 alter table byway_routes drop column resource_type;
 alter table byway_routes rename column resource_id to byway_id;
 delete from byway_routes where byway_id not in (select id from byways);
 alter table byway_routes add constraint byway_routes_byway_id_fkey foreign key (byway_id) references byways(id) on delete cascade;
 
+-- Referential integrity for other assets related to byways
+
 alter table byways add constraint byways_primary_photo_id_fkey  foreign key (primary_photo_id) references assets(id) on delete set null;
 alter table byways add constraint byways_logo_id_fkey  foreign key (logo_id) references assets(id) on delete set null;
 alter table byways add constraint byways_roadsign_id_fkey  foreign key (roadsign_id) references assets(id) on delete set null;
+
+-- Split Visitor Services
 
 alter table visitor_services rename to visitor_service_types;
 alter sequence visitor_services_id_seq rename to visitor_service_types_id_seq;
@@ -264,6 +278,8 @@ SELECT setval('place_visitor_services_id_seq', COALESCE((SELECT MAX(id)+1 FROM p
 
 drop table visitor_service_links;
 
+-- Split seasonal information
+
 create table byway_seasons (
   id serial primary key,
   byway_id int not null references byways(id) on delete cascade,
@@ -293,6 +309,8 @@ insert into place_seasons
 SELECT setval('place_seasons_id_seq', COALESCE((SELECT MAX(id)+1 FROM place_seasons), 1), false);
 
 drop table season_descriptions;
+
+-- Split extended descriptions
 
 create table byway_extended_descriptions (
   id serial primary key,
@@ -337,6 +355,8 @@ insert into state_extended_descriptions
 SELECT setval('state_extended_descriptions_id_seq', COALESCE((SELECT MAX(id)+1 FROM state_extended_descriptions), 1), false);
 
 drop table extended_descriptions;
+
+-- Filter taggings and add FK
 
 create table asset_taggings (
   id serial primary key,
