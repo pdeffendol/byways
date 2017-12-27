@@ -25,5 +25,7 @@ The PostgreSQL database dump requires the PostGIS extension.  Use the
 `pg_restore` command to load it into an empty database:
 
 ```
-pg_restore -d byways --no-owner --no-privileges < byways.pgdump
+pg_restore -d byways < byways.pgdump
 ```
+
+The dump file was created from PostgreSQL 10.1 with PostGIS 2.4.2.
