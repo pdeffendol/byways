@@ -16,3 +16,14 @@ This information was last updated in September 2013, and no guarantee is
 made to its continual accuracy.  Road conditions, services available, and
 tourism contacts are especially subject to change.  Use and distribute at
 your own risk.
+
+## Loading Data
+
+### PostgreSQL
+
+The PostgreSQL database dump requires the PostGIS extension.  Use the
+`pg_restore` command to load it into an empty database:
+
+```
+pg_restore -d byways --no-owner --no-privileges < byways.pgdump
+```
