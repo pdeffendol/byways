@@ -216,20 +216,24 @@ alter table byways drop column display_type;
 -- Clean up schema for better referential integrity, etc.
 --
 
--- Split illustrations
+-- Split illustrations (EF Core requires primary keys on join tables)
 
-create table byways_assets (
+create table byway_assets (
+  id serial primary key,
   byway_id int not null references byways(id) on delete cascade,
   asset_id int not null references assets(id) on delete cascade
 );
+SELECT setval('byway_assets_id_seq', COALESCE((SELECT MAX(id)+1 FROM byway_assets), 1), false);
 
-create table places_assets (
+create table place_assets (
+  id serial primary key,
   place_id int not null references places(id) on delete cascade,
   asset_id int not null references assets(id) on delete cascade
 );
+SELECT setval('place_assets_id_seq', COALESCE((SELECT MAX(id)+1 FROM place_assets), 1), false);
 
-insert into byways_assets select illustratable_id, asset_id from illustrations where illustratable_type='Byway' and illustratable_id in (select id from byways);
-insert into places_assets select illustratable_id, asset_id from illustrations where illustratable_type='Place' and illustratable_id in (select id from places);
+insert into byway_assets select id, illustratable_id, asset_id from illustrations where illustratable_type='Byway' and illustratable_id in (select id from byways);
+insert into place_assets select id, illustratable_id, asset_id from illustrations where illustratable_type='Place' and illustratable_id in (select id from places);
 
 drop table illustrations;
 
