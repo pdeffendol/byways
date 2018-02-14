@@ -196,6 +196,22 @@ update byways set primary_photo_id = null where primary_photo_id not in (select 
 update byways set logo_id = null where logo_id not in (select id from assets);
 update byways set roadsign_id = null where roadsign_id not in (select id from assets);
 
+-- Remove columns we won't use anymore
+
+alter table assets drop column copyright_holder;
+alter table assets drop column copyright_date;
+alter table assets drop column copyrighted;
+alter table assets drop column usage_rights;
+alter table assets drop column usage_conditions;
+alter table assets drop column download_restriction;
+alter table assets drop column external_url;
+alter table assets drop column creative_commons_license_id;
+alter table assets drop column delta;
+alter table assets drop column permission_notes;
+alter table assets drop column permission_status;
+
+alter table byways drop column display_type;
+
 --
 -- Clean up schema for better referential integrity, etc.
 --
@@ -370,3 +386,8 @@ insert into asset_taggings
   where taggable_type='Asset' and taggable_id in (select id from assets);
 SELECT setval('asset_taggings_id_seq', COALESCE((SELECT MAX(id)+1 FROM asset_taggings), 1), false);
 drop table taggings;
+
+-- Adjust some data types
+
+alter table byways alter column length type decimal;
+alter table directions alter column travel_distance type decimal;
