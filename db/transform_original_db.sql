@@ -209,6 +209,7 @@ alter table assets drop column creative_commons_license_id;
 alter table assets drop column delta;
 alter table assets drop column permission_notes;
 alter table assets drop column permission_status;
+drop table creative_commons_licenses;
 
 alter table byways drop column display_type;
 
