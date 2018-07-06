@@ -209,6 +209,9 @@ alter table assets drop column creative_commons_license_id;
 alter table assets drop column delta;
 alter table assets drop column permission_notes;
 alter table assets drop column permission_status;
+alter table asset_files rename file_file_name to file_name;
+alter table asset_files rename file_content_type to content_type;
+alter table asset_files rename file_file_size to file_size;
 drop table creative_commons_licenses;
 
 alter table byways drop column display_type;
