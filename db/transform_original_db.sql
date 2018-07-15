@@ -397,5 +397,6 @@ drop table taggings;
 
 -- Adjust some data types
 
-alter table byways alter column length type decimal;
+alter table byways alter column length rename to length_in_miles;
+alter table byways alter column length_in_miles type decimal;
 alter table directions alter column travel_distance type decimal;
