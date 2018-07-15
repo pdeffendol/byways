@@ -1,9 +1,12 @@
 --
 -- Clean up the schema of the original NSBO PostgreSQL database, to make it
--- more usable by third parties.
+-- more suitable for third parties.
 --
 -- This retains only public byway and place data.
 --
+-- To make a clean dump:
+--
+-- pg_dump -Fc --no-owner --no-privileges > pgsql/byways.dump
 
 -- Remove secondary data schema
 drop schema forums cascade;
@@ -397,6 +400,6 @@ drop table taggings;
 
 -- Adjust some data types
 
-alter table byways alter column length rename to length_in_miles;
+alter table byways rename column length to length_in_miles;
 alter table byways alter column length_in_miles type decimal;
 alter table directions alter column travel_distance type decimal;
