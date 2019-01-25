@@ -147,6 +147,7 @@ drop table website_categories;
 drop table collection_memberships;
 drop table collections;
 drop table asset_alternate_files;
+drop table creative_commons_licenses;
 
 drop table static_maps;
 drop table static_map_legends;
@@ -212,10 +213,10 @@ alter table assets drop column creative_commons_license_id;
 alter table assets drop column delta;
 alter table assets drop column permission_notes;
 alter table assets drop column permission_status;
-alter table asset_files rename file_file_name to file_name;
-alter table asset_files rename file_content_type to content_type;
-alter table asset_files rename file_file_size to file_size;
-drop table creative_commons_licenses;
+alter table asset_files drop column remote_file_name;
+alter table asset_files drop column remote_file_size;
+alter table asset_files drop column remote_content_type;
+alter table asset_files drop column remote_updated_at;
 
 alter table byways drop column display_type;
 
@@ -244,15 +245,11 @@ insert into place_assets select id, illustratable_id, asset_id from illustration
 
 drop table illustrations;
 
--- Remove implementation-specific columns from asset_files
+-- Simplify column names in asset_files
 
-alter table asset_files drop column remote_file_name;
-alter table asset_files drop column remote_file_size;
-alter table asset_files drop column remote_content_type;
-alter table asset_files drop column remote_updated_at;
-alter table asset_files rename column local_content_type to file_content_type;
-alter table asset_files rename column local_file_name to file_file_name;
-alter table asset_files rename column local_file_size to file_file_size;
+alter table asset_files rename column local_content_type to content_type;
+alter table asset_files rename column local_file_name to file_name;
+alter table asset_files rename column local_file_size to file_size;
 alter table asset_files rename column local_updated_at to file_updated_at;
 
 -- Clean up routes
